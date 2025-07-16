@@ -131,6 +131,9 @@ const News = () => {
 						className='bg-white rounded shadow-md overflow-hidden hover:shadow-lg transition flex flex-col justify-between'
 					>
 						<div className='p-4'>
+						  <div>
+								<img src={item?.image ? `${API_URL}/${item.image}` : ""} alt="" style={{width: "100px" , height: "100px"}} />
+							</div>
 							<h1 className='text-lg font-bold mb-2'>{item.title}</h1>
 							<p className='text-gray-700'>{item.desc}</p>
 						</div>
