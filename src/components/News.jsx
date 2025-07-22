@@ -9,12 +9,13 @@ const News = () => {
 	const [desc, setDesc] = useState("")
 	const [open, setOpen] = useState(false)
 	const [editId, setEditId] = useState(null)
+	const [image, setImage] = useState("")
 
 	const getAllNews = async () => {
 		try {
 			const { data } = await axios.get(API_URL + "/news/get-all")
-			console.log(data);
-			
+			console.log(data)
+
 			if (data.success) {
 				setNews(data.data)
 			}
@@ -27,17 +28,22 @@ const News = () => {
 		try {
 			if (editId) {
 				// Update
-				const { data } = await axios.put(API_URL + `/news/update/${editId}`, { title, desc })
+				const { data } = await axios.put(API_URL + `/news/update/${editId}`, { title, desc,image })
 				if (data.success) {
 					toast.success("News updated!")
 					resetForm()
 					getAllNews()
 				}
 			} else {
+
 				// Add
-				const { data } = await axios.post(API_URL + "/news/add", { title, desc })
-				console.log(data);
-				
+
+				const { data } = await axios.post(API_URL + "/news/add", {
+					title,
+					desc,
+					image
+				})
+
 				if (data.success) {
 					toast.success("News created!")
 					resetForm()
@@ -64,6 +70,7 @@ const News = () => {
 	const resetForm = () => {
 		setTitle("")
 		setDesc("")
+		setImage("")
 		setEditId(null)
 		setOpen(false)
 	}
@@ -74,7 +81,26 @@ const News = () => {
 		setEditId(item._id)
 		setOpen(true)
 	}
-
+	const handleImageUpload = async (file) => {
+		if (!file) {
+			toast.error("Please upload as image")
+			return
+		}
+		const formData = new FormData()
+		formData.append("file", file)
+		try {
+			const { data } = await axios.post(
+				API_URL + "/upload",
+				formData
+			)
+			if (data.success) {
+				toast.success("Upload image succsessfuly")
+				setImage(data.file_path)
+			}
+		} catch (error) {
+			toast.error(error.response.data.message || error.response.data.msg)
+		}
+	}
 	useEffect(() => {
 		getAllNews()
 	}, [])
@@ -108,10 +134,18 @@ const News = () => {
 							className='w-full mb-3 px-3 py-2 border rounded'
 							rows={4}
 						></textarea>
+						<input
+							type="file"
+							className='w-full mb-3 px-3 py-2 border rounded'
+							onChange={(e) => handleImageUpload(e.target.files[0])}
+						/>
 						<div className='flex justify-between'>
 							<button
 								onClick={addOrUpdateNews}
-								className='px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition'>
+								className='px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition'
+								disabled={!image}
+								>
+
 								{editId ? "Update" : "Submit"}
 							</button>
 							<button
@@ -131,8 +165,14 @@ const News = () => {
 						className='bg-white rounded shadow-md overflow-hidden hover:shadow-lg transition flex flex-col justify-between'
 					>
 						<div className='p-4'>
-						  <div>
-								<img src={item?.image ? `${API_URL}/${item.image}` : ""} alt="" style={{width: "100px" , height: "100px"}} />
+							<div>
+								{item?.image && (
+									<img
+										src={`${item.image}`}
+										alt=""
+										style={{ width: "100px", height: "100px" }}
+									/>
+								)}
 							</div>
 							<h1 className='text-lg font-bold mb-2'>{item.title}</h1>
 							<p className='text-gray-700'>{item.desc}</p>
