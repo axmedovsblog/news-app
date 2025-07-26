@@ -28,7 +28,11 @@ const News = () => {
 		try {
 			if (editId) {
 				// Update
-				const { data } = await axios.put(API_URL + `/news/update/${editId}`, { title, desc,image })
+				const { data } = await axios.put(API_URL + `/news/update/${editId}`, { title, desc,image },{
+					headers:{
+						Authorization: `Bearer ${localStorage.getItem("token")}`
+					}
+				})
 				if (data.success) {
 					toast.success("News updated!")
 					resetForm()
@@ -42,6 +46,10 @@ const News = () => {
 					title,
 					desc,
 					image
+				},{
+					headers:{
+						Authorization: `Bearer ${localStorage.getItem("token")}`
+					}
 				})
 
 				if (data.success) {
@@ -57,7 +65,11 @@ const News = () => {
 
 	const deleteNews = async (id) => {
 		try {
-			const { data } = await axios.delete(API_URL + `/news/delete/${id}`)
+			const { data } = await axios.delete(API_URL + `/news/delete/${id}`,{
+				headers:{
+					Authorization: `Bearer ${localStorage.getItem("token")}`
+				}
+			})
 			if (data.success) {
 				toast.success("News deleted!")
 				getAllNews()
@@ -91,7 +103,11 @@ const News = () => {
 		try {
 			const { data } = await axios.post(
 				API_URL + "/upload",
-				formData
+				formData,{
+					headers:{
+						Authorization: `Bearer ${localStorage.getItem("token")}`
+					}
+				}
 			)
 			if (data.success) {
 				toast.success("Upload image succsessfuly")
