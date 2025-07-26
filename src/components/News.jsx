@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { API_URL } from '../config'
 import { toast } from 'react-toastify'
 
-const News = () => {
+const News = ({user_id}) => {
 	const [news, setNews] = useState([])
 	const [title, setTitle] = useState("")
 	const [desc, setDesc] = useState("")
@@ -13,8 +13,7 @@ const News = () => {
 
 	const getAllNews = async () => {
 		try {
-			const { data } = await axios.get(API_URL + "/news/get-all")
-			console.log(data)
+			const { data } = await axios.get(`${API_URL}/news/get-all?user_id=${user_id}`)
 
 			if (data.success) {
 				setNews(data.data)
@@ -68,7 +67,9 @@ const News = () => {
 			const { data } = await axios.delete(API_URL + `/news/delete/${id}`,{
 				headers:{
 					Authorization: `Bearer ${localStorage.getItem("token")}`
+					
 				}
+				
 			})
 			if (data.success) {
 				toast.success("News deleted!")
@@ -118,8 +119,11 @@ const News = () => {
 		}
 	}
 	useEffect(() => {
-		getAllNews()
-	}, [])
+		if (user_id) {
+			getAllNews()
+		}
+	
+	}, [user_id])
 
 	return (
 		<div className='p-8 bg-gray-50 min-h-screen'>
